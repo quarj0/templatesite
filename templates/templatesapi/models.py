@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Template(models.Model):
     title = models.CharField(max_length=100)
@@ -13,3 +14,31 @@ class Template(models.Model):
 
     def __str__(self):
         return self.title
+
+class User(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    password = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50)
+    order_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username + ' - ' + self.template.title
+
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+    category = models.ForeignKey(Template, on_delete=models.CASCADE)
+    description = models.TextField()
+    image = models.ImageField(upload_to='categories/images')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
