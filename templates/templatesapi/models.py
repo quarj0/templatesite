@@ -1,5 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+
+class UserProfile(AbstractUser):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.username
 
 class Template(models.Model):
     title = models.CharField(max_length=100)
@@ -15,16 +22,6 @@ class Template(models.Model):
     def __str__(self):
         return self.title
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.username
-
 class Order(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
@@ -32,10 +29,11 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username + ' - ' + self.template.title
+        return f"{self.user.username} - {self.template.title}"
+
 
 class Category(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, name='category name')
     description = models.TextField()
     image = models.ImageField(upload_to='categories/images')
     created_at = models.DateTimeField(auto_now_add=True)

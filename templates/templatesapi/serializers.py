@@ -14,21 +14,9 @@ class UserSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['id', 'user', 'template', 'created_at', 'price', 'status']
-
+        fields = ['id', 'user', 'template', 'order_date', 'status']
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description', 'created_at']
-
-class ResetPasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['id', 'email']
-
-class ChangePasswordSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = UserProfile
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'name', 'description', 'image', 'created_at']
