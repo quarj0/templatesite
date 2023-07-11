@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Template
+from .models import Template, UserProfile, Order, Category
 
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,7 +8,7 @@ class TemplateSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = UserProfile
         fields = ['id', 'username', 'email', 'password']
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -19,5 +19,16 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-    model = Category
-    field = ['id', 'name', 'description', 'created_at']
+        model = Category
+        fields = ['id', 'name', 'description', 'created_at']
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'email']
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'username', 'password']

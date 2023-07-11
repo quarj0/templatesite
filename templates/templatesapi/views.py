@@ -2,11 +2,10 @@ from rest_framework import generics
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Template
+from .models import Template, User
 from .serializers import TemplateSerializer, UserSerializer, OrderSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 
@@ -15,7 +14,6 @@ class UserRegisterView(generics.CreateAPIView):
     queryset = Template.objects.all()
     serializer_class = UserSerializer
 
-    
     @csrf_exempt
     def user_login(request):
         if request.method == 'POST':
@@ -51,8 +49,7 @@ class UserRegisterView(generics.CreateAPIView):
                 return JsonResponse({'error': 'Invalid login details supplied.'}, status=400)
         else:
             return JsonResponse({'error': 'Invalid request method'}, status=400)
-    
-            
+          
     @csrf_exempt
     def reset_password(request):
         if request.method == "POST":
@@ -77,4 +74,12 @@ class UserRegisterView(generics.CreateAPIView):
 class OrderView(generics.ListCreateAPIView):
     queryset = Template.objects.all()
     serializer_class = OrderSerializer
+
+
+class TemplateListView(generics.ListCreateAPIView):
+    queryset = Template.objects.all()
+    serializer_class = TemplateSerializer
+    
+
+
 
