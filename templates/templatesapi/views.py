@@ -74,3 +74,18 @@ class OrderView(generics.ListCreateAPIView):
 class TemplateListView(generics.ListCreateAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
+
+
+class TemplateSearchView(generics.ListAPIView):
+    serializer_class = TemplateSerializer
+
+    def get_queryset(self):
+        queryset = Template.objects.all()
+        title = self.request.query_params.get('title', None)
+        category = self.request.query_params.get('category', None)
+        if title is not None:
+            queryset = queryset.filter(title__icontains=title)
+        if category is not None:
+            queryset = queryset.filter(category__name__icontains=category)
+        return queryset
+        
