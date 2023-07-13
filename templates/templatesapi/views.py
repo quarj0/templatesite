@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
@@ -7,13 +8,32 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from .models import Template, UserProfile, Order
-from .serializers import TemplateSerializer, UserSerializer, OrderSerializer
+from .models import Template, UserProfile, Order, User
+from .serializers import TemplateSerializer, UserSerializer, OrderSerializer, UserProfileSerializer
 
 class UserRegisterView(generics.CreateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserSerializer
+    
+    
+    def perform_create(self, serializer):
+        user = User.objects.create_user(
+            username = serializer.validated_data['username'],
+            email = serializer.validated_data['email'],
+            password = serializer.validated_data['password'],
+        )
+        
+        serializer.save(user=user)
+        
 
+class UserProfileView(generics.RetrieveAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.userprofile
+    
 class UserLoginView(APIView):
     @csrf_exempt
     def post(self, request):
@@ -86,6 +106,6 @@ class TemplateSearchView(generics.ListAPIView):
         if title is not None:
             queryset = queryset.filter(title__icontains=title)
         if category is not None:
-            queryset = queryset.filter(category__name__icontains=category)
+            queryset = queryset.filter(category__icontains=category)
         return queryset
         

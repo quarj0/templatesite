@@ -20,3 +20,8 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'description', 'image', 'created_at']
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['first_name', 'last_name', 'username', 'email', 'password', 'city', 'phone', 'address']
