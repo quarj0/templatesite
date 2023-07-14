@@ -44,6 +44,16 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "templatebackend.urls"
 
+
+REST_FRAMEWORK = {
+    
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    )
+}
+
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -132,7 +142,7 @@ CORS_ALLOW_CREDENTIALS = True
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "your email"
-EMAIL_HOST_PASSWORD = "your password"
+EMAIL_HOST_USER = "guidemelearn.info@gmail.com"
+EMAIL_HOST_PASSWORD = "bhmefbwrowndncrq"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False

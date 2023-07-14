@@ -9,7 +9,7 @@ class TemplateSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'password', 'city', 'phone', 'address']
+        fields = ['id', 'username', 'email', 'password']
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:

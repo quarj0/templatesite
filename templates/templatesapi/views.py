@@ -1,9 +1,12 @@
+from django.core.mail import send_mail
+from templatebackend.settings import EMAIL_HOST_USER
 from rest_framework.views import APIView
+from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from django.contrib.auth import authenticate, login
+from django.middleware.csrf import get_token
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
@@ -35,7 +38,6 @@ class UserProfileView(generics.RetrieveAPIView):
         return self.request.user.userprofile
     
 class UserLoginView(APIView):
-    @csrf_exempt
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -49,11 +51,28 @@ class UserLoginView(APIView):
         else:
             return JsonResponse({'error': 'Invalid login details supplied.'}, status=400)
 
+
+class ChangeEmailView(APIView):
+    def post(self, request):
+        password = request.data.get('password')
+        new_email = request.data.get('new_email')
+        user = authenticate(request, username=request.user.username, password=password)
+        if user is not None:
+            if user.is_active:
+                user.email = new_email
+                user.save()
+                return JsonResponse({'message': 'Email changed successfully'})
+            else:
+                return JsonResponse({'error': 'Your account is disabled.'}, status=400)
+        else:
+            return JsonResponse({'error': 'Invalid login details supplied.'}, status=400)
+
+
+
 class ChangePasswordView(APIView):
-    @csrf_exempt
     def post(self, request):
         username = request.data.get('username')
-        old_password = request.data.get('old_password')
+        old_password = request.data.get('password')
         new_password = request.data.get('new_password')
         user = authenticate(request, username=username, password=old_password)
         if user is not None:
@@ -66,26 +85,35 @@ class ChangePasswordView(APIView):
         else:
             return JsonResponse({'error': 'Invalid login details supplied.'}, status=400)
 
+
 class ResetPasswordView(APIView):
-    @csrf_exempt
     def post(self, request):
         email = request.data.get('email')
-        user = UserProfile.objects.get(email=email)
-        if user is not None:
-            if user.is_active:
-                # Generate a password reset token
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk)).decode()
-                
-                # Build the password reset link
-                current_site = get_current_site(request)
-                reset_link = f"http://{current_site.domain}/reset-password/{uid}/{token}/"
-                
-                return JsonResponse({'reset_link': reset_link})
-            else:
-                return JsonResponse({'error': 'Your account is disabled.'}, status=400)
-        else:
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
             return JsonResponse({'error': 'Invalid login details supplied.'}, status=400)
+
+        if user.is_active:
+            # Generate a password reset token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk)).encode('utf-8').decode()
+
+            # Build the password reset link
+            current_site = get_current_site(request)
+            reset_link = f"http://{current_site.domain}/reset-password/{uid}/{token}/"
+
+            # Send the email
+            subject = 'Password Reset'
+            message = f'Click the following link to reset your password: {reset_link}'
+            from_email = EMAIL_HOST_USER # Update with your email address
+            to_email = user.email
+            send_mail(subject, message, from_email, [to_email])
+
+            return JsonResponse({'message': 'Password reset link sent to your email'})
+        else:
+            return JsonResponse({'error': 'Your account is disabled.'}, status=400)
+
 
 class OrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
@@ -107,5 +135,10 @@ class TemplateSearchView(generics.ListAPIView):
             queryset = queryset.filter(title__icontains=title)
         if category is not None:
             queryset = queryset.filter(category__icontains=category)
-        return queryset
-        
+        return queryset    
+
+
+
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrfToken': csrf_token})
