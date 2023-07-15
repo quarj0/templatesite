@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,10 +9,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-np3f^+lba_edv(d@4ax1*8^=(5pm&wl(-pxz(hdkn%pp)vhk9w"
+SECRET_KEY = "SECRET_KEY"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = []
 
@@ -28,9 +29,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "templatesapi",
     "rest_framework",
     "corsheaders",
+    "mytemplateweb",
 ]
 
 MIDDLEWARE = [
@@ -44,22 +45,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "templatebackend.urls"
-
-
-REST_FRAMEWORK = {
-    
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    )
-}
-
+ROOT_URLCONF = "templatemarket.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'build')],
+        "DIRS": [os.path.join(BASE_DIR, "build")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -72,23 +63,56 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "templatebackend.wsgi.application"
+WSGI_APPLICATION = "templatemarket.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "DATABASE_NAME",
+#         "HOST": "DATABASE_HOST",
+#         "USER": "DATABASE_USER",
+#         "PASSWORD": "DATABASE_PASSWORD",
+#         "PORT": 3306,
+#     }
+# }
 
 DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.mysql',
-       'NAME': 'DATABASE_NAME',
-       'HOST': 'localhost',
-       'USER': 'DATABASE_USER',
-       'PASSWORD': 'DATABASE_PASSWORD',
-       'PORT': 3306
-   }
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
 }
+
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    )
+}
+
+
+# Email Settings
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "EMAL_HOST"
+
+EMAIL_PORT = 587
+
+EMAIL_HOST_PASSWORD = "EMAIL_HOST_PASSWORD"
+
+EMAIL_HOST_USER = "EMAIL_HOST_USER"
+
+EMAIL_USE_TLS = True
+
+EMAIL_USE_SSL = False
+
 
 
 
@@ -127,30 +151,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIR = [
-    os.path.join(BASE_DIR, 'build/static')
-]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIR = [os.path.join(BASE_DIR, "build/static")]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "Email_HOST"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = "EMAIL_HOST_USER"
-EMAIL_HOST_PASSWORD = "EMAIL_HOST_PASSWORD"
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False

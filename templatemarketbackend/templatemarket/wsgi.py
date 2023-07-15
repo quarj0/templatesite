@@ -1,5 +1,5 @@
 """
-WSGI config for templatebackend project.
+WSGI config for templatemarket project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatebackend.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatemarket.settings")
 
 application = get_wsgi_application()
