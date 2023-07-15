@@ -6,13 +6,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from django.contrib.auth import authenticate, login
 from django.middleware.csrf import get_token
+from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from .models import Template, UserProfile, Order, User
-from .serializers import TemplateSerializer, UserSerializer, OrderSerializer, UserProfileSerializer
+from .serializers import TemplateSerializer, UserSerializer, OrderSerializer, UserProfileSerializer, TemplateCreatorSerializer
 
 class UserRegisterView(generics.CreateAPIView):
     queryset = UserProfile.objects.all()
@@ -105,7 +110,11 @@ class ResetPasswordView(APIView):
 
             # Send the email
             subject = 'Password Reset'
-            message = f'Click the following link to reset your password: {reset_link}'
+            message = f"""Click the following link to reset your password: {reset_link}\n
+            If you did not request a password reset, please ignore this email.\n
+            Thank you,\n
+            My Templates
+            """
             from_email = EMAIL_HOST_USER # Update with your email address
             to_email = user.email
             send_mail(subject, message, from_email, [to_email])
@@ -135,7 +144,41 @@ class TemplateSearchView(generics.ListAPIView):
             queryset = queryset.filter(title__icontains=title)
         if category is not None:
             queryset = queryset.filter(category__icontains=category)
-        return queryset    
+        return queryset
+
+
+@csrf_exempt
+@api_view(['POST'])
+def upload_template(request):
+    serializer = TemplateCreatorSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    title = request.data.get('title')
+    description = request.data.get('description')
+    category = request.data.get('category')
+    image = request.FILES.get('image')
+    file = request.FILES.get('file')
+    is_free = request.data.get('is_free')
+    price = request.data.get('price')
+
+    # Perform file type validation
+    allowed_extensions = ['.html', '.htm', '.zip', 'jpeg', 'jpg', 'png']  # Add other allowed file extensions as needed
+
+    file_extension = default_storage.get_extension(file.name)
+    if file_extension not in allowed_extensions:
+        return Response({'error': 'Invalid file type. Only HTML files or ZIP archives are allowed.'}, status=400)
+
+    # Additional security measures can be implemented here, such as scanning for malicious code or using antivirus checks
+    
+    
+    # Save the template if it passes the validation
+    try:
+        template = Template(title=title, description=description, file=file, image=image, category=category, is_free=is_free, price=price)
+        template.full_clean()  # Validate model fields
+        template.save()
+    except ValidationError as e:
+        return Response({'error': e}, status=400)
+
+    return Response({'message': 'Template uploaded successfully'})
 
 
 

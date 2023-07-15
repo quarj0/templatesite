@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100, default='', blank=True, null=True)
@@ -23,6 +25,7 @@ class Template(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     download_link = models.URLField()
     author = models.CharField(max_length=100)
+    is_free = models.BooleanField(default=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     rating = models.DecimalField(max_digits=3, decimal_places=2)
 

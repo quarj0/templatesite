@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -76,12 +78,18 @@ WSGI_APPLICATION = "templatebackend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.mysql',
+       'NAME': 'DATABASE_NAME',
+       'HOST': 'localhost',
+       'USER': 'DATABASE_USER',
+       'PASSWORD': 'DATABASE_PASSWORD',
+       'PORT': 3306
+   }
 }
+
 
 
 # Password validation
@@ -140,9 +148,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST = "Email_HOST"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "guidemelearn.info@gmail.com"
-EMAIL_HOST_PASSWORD = "bhmefbwrowndncrq"
+EMAIL_HOST_USER = "EMAIL_HOST_USER"
+EMAIL_HOST_PASSWORD = "EMAIL_HOST_PASSWORD"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False

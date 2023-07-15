@@ -4,7 +4,7 @@ from .models import Template, UserProfile, Order, Category
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template
-        fields = ['id', 'title', 'description', 'image', 'category', 'created_at', 'download_link', 'author', 'price', 'rating']
+        fields = ['id', 'title', 'description', 'image', 'category', 'created_at', 'download_link', 'author', 'is_free', 'price', 'rating']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +25,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['first_name', 'last_name', 'username', 'email', 'password', 'city', 'phone', 'address']
+        
+class TemplateCreatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Template
+        fields = ['title', 'description', 'image', 'category', 'download_link', 'author', 'is_free', 'price']
