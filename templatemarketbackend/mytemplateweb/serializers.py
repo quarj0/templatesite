@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Template, UserProfile, Order, Category
-
+import re
 
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,14 +18,8 @@ class TemplateSerializer(serializers.ModelSerializer):
             "price",
             "rating",
         ]
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ["id", "username", "email", "password"]
-
-
+    
+        
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
@@ -79,3 +73,24 @@ class TemplateCreatorSerializer(serializers.ModelSerializer):
             "is_free",
             "price",
         ]
+        
+class UserRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = [
+            "username",
+            "email",
+            "password",
+        ]
+        
+    def validate(self, data):
+        if UserProfile.objects.filter(email=data["email"]).exists():
+            raise serializers.ValidationError("Email already exists")
+        
+        elif UserProfile.objects.filter(username=data["username"]).exists():
+            raise serializers.ValidationError("Username already exists")
+        
+        if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$', data["password"]):
+            raise serializers.ValidationError("Password must contain at least 6 characters, one uppercase, one lowercase, one number and one special character")
+        return data
+    

@@ -32,7 +32,7 @@ urlpatterns = [
     path("account/change/password", ChangePasswordView.as_view(), name="login"),
     path("reset/password", ResetPasswordView.as_view(), name="reset password"),
     path(
-        "reset/password/<str:uid>/<str:token>",
+        "reset/password/<str:uid>/<str:token>/",
         ResetPasswordView.as_view(),
         name="reset password",
     ),
