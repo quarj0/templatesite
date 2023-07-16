@@ -23,7 +23,18 @@ CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'http://localhost:3000',
+    'http://localhost:8000',
+    '127.0.0.1',
+    
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    # Add more allowed origins as needed
+]
+
 
 
 # Application definition
@@ -74,6 +85,7 @@ WSGI_APPLICATION = "templatemarket.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

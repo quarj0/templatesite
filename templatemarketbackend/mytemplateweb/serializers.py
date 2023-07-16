@@ -51,6 +51,20 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "phone",
             "address",
         ]
+        
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "city",
+            "phone",
+            "address",
+        ]
 
 
 class TemplateCreatorSerializer(serializers.ModelSerializer):

@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 from django.contrib.auth import authenticate, login
 from django.middleware.csrf import get_token
 from django.core.exceptions import ValidationError
@@ -15,11 +15,13 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-
+import re
+from django.utils.decorators import method_decorator
 from templatemarket.settings import EMAIL_HOST_USER
 from .models import Template, UserProfile, Order, User
 from .serializers import (
     TemplateSerializer,
+    UpdateProfileSerializer,
     UserSerializer,
     OrderSerializer,
     UserProfileSerializer,
@@ -27,18 +29,56 @@ from .serializers import (
 )
 
 
-class UserRegisterView(generics.CreateAPIView):
-    queryset = UserProfile.objects.all()
+@method_decorator(csrf_exempt, name="dispatch")
+class UserRegisterView(APIView):
+    permission_classes = (permissions.AllowAny,)
     serializer_class = UserSerializer
+    
+    def post(self, request, format=None):
+        data = request.data
+        
+        username = data.get("username")
+        email = data.get("email")
+        password = data.get("password")
+        
+        # Validate username
+        if not re.match(r'^[a-zA-Z0-9_]{4,20}$', username):
+            return Response({"error": "Username must be 4-20 characters long and can only contain letters, numbers, and underscores."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if username already exists
+        if User.objects.filter(username=username).exists():
+            return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate email
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            return Response({"error": "Invalid email address."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email address already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate password
+        if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+            return Response({"error": "Password must contain at least one lowercase letter, one uppercase letter, one numeric character, one special character, and be at least 8 characters long."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create user
+        user = User.objects.create_user(username=username, email=email, password=password)
+        
+        # Serialize user data
+        serializer = self.serializer_class(user)
+        
+        # Return success response
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def perform_create(self, serializer):
-        user = User.objects.create_user(
-            username=serializer.validated_data["username"],
-            email=serializer.validated_data["email"],
-            password=serializer.validated_data["password"],
+
+class UpdateProfileView(generics.UpdateAPIView):
+    def put(self, request, format=None):
+        serializer = UpdateProfileSerializer(
+            request.user.userprofile, data=request.data, partial=True
         )
-
-        serializer.save(user=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class UserProfileView(generics.RetrieveAPIView):
