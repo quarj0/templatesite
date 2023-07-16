@@ -37,4 +37,5 @@ urlpatterns = [
         name="reset password",
     ),
     path("order", OrderView.as_view(), name="order-template"),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
