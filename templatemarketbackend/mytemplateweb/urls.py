@@ -30,9 +30,9 @@ urlpatterns = [
     path("account/change/password", ChangePasswordView.as_view(), name="login"),
     path("templatelist", TemplateListView.as_view(), name="template-list"),
     path("templates/search", TemplateSearchView.as_view(), name="template-search"),
-    path("reset/password", ResetPasswordView.as_view(), name="reset password"),
+    path("password/reset", ResetPasswordView.as_view(), name="reset password"),
     path(
-        "reset/password/<str:uid>/<str:token>/",
+        "password/reset/<str:uid>/<str:token>/",
         ResetPasswordView.as_view(),
         name="reset password",
     ),

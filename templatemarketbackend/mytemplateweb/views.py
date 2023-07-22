@@ -1,6 +1,4 @@
 from django.core.mail import send_mail
-from django.db import IntegrityError
-from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -53,7 +51,6 @@ class UserRegisterView(generics.CreateAPIView):
 @method_decorator(csrf_protect, name="dispatch")       
 @method_decorator(login_required, name="dispatch")       
 class UpdateProfileView(generics.UpdateAPIView):
-    serializer_class = UpdateProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     def put(self, request, format=None):
         try:
@@ -97,59 +94,52 @@ class UserLoginView(APIView):
         except:
             return Response({"Oops!": "Something went wrong when trying to login. \n Please try again later."})
             
-
 @method_decorator(csrf_protect, name="dispatch")
 @method_decorator(login_required, name="dispatch")
 class ChangeEmailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
     def post(self, request):
         try:
             password = request.data.get("password")
             new_email = request.data.get("new_email")
-            
             user = authenticate(request, username=request.user.username, password=password)
-            
             if user is not None:
                 if user.is_active:
                     user.email = new_email
                     user.save()
-                    return Response({"message": "Email changed successfully"})
+                    return JsonResponse({"message": "Email changed successfully"})
                 else:
-                    return Response({"error": "Your account is disabled."}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({"error": "Your account is disabled."}, status=400)
             else:
-                return Response({"error": "Invalid login details supplied."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        except IntegrityError as e:
-            return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        except Exception as e:
-            return Response({"error": "Oops! Something went wrong when trying to update your email. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+                return JsonResponse(
+                    {"error": "Invalid login details supplied."}, status=400
+                )
+        except:
+            return Response({"Oops!": "Something went wrong when trying to update your email. \n Please try again later."})
 
 @method_decorator(csrf_protect, name="dispatch")
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
     def post(self, request):
+        username = request.data.get("username")
         old_password = request.data.get("password")
         new_password = request.data.get("new_password")
-        
-        user = request.user  # Assuming you are using TokenAuthentication or SessionAuthentication
-        
-        if user.check_password(old_password):
-            user.set_password(new_password)
-            user.save()
-            return Response({"message": "Password changed successfully"})
+        user = authenticate(request, username=username, password=old_password)
+        if user is not None:
+            if user.is_active:
+                user.set_password(new_password)
+                user.save()
+                return JsonResponse({"message": "Password changed successfully"})
+            else:
+                return JsonResponse({"error": "Your account is disabled."}, status=400)
         else:
-            return Response({"error": "Invalid old password."}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"error": "Invalid login details supplied."}, status=400
+            )
 
 @method_decorator(csrf_protect, name="dispatch")
 class ResetPasswordView(APIView):
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     def post(self, request):
         email = request.data.get("email")
         try:
