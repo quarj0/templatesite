@@ -31,11 +31,8 @@ urlpatterns = [
     path("templatelist", TemplateListView.as_view(), name="template-list"),
     path("templates/search", TemplateSearchView.as_view(), name="template-search"),
     path("password/reset", ResetPasswordView.as_view(), name="reset password"),
-    path(
-        "password/reset/<str:uid>/<str:token>/",
-        ResetPasswordView.as_view(),
-        name="reset password",
-    ),
+    path("password/reset/<str:uid>/<str:token>/", ResetPasswordView.as_view(), name="reset password"),
     path("order", OrderView.as_view(), name="order-template"),
+    
 ]
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
