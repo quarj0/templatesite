@@ -10,7 +10,7 @@ from .views import (
     TemplateSearchView,
     get_csrf_token,
     ChangeEmailView,
-    upload_template,
+    UploadTemplateView,
     UpdateProfileView,
 )
 from django.conf import settings
@@ -21,7 +21,7 @@ app_name = "templatesapi"
 
 urlpatterns = [
     path("api/token", get_csrf_token, name="get csrf token"),
-    path("upload/template", upload_template, name="upload template"),
+    path("upload/template", UploadTemplateView.as_view(), name="upload template"),
     path("account/update/profile", UpdateProfileView.as_view(), name="update profile"),
     path("account/register", UserRegisterView.as_view(), name="registration"),
     path("account/login", UserLoginView.as_view(), name="login"),

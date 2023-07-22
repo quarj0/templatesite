@@ -1,4 +1,6 @@
 from django.core.mail import send_mail
+from django.db import IntegrityError
+from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -51,6 +53,7 @@ class UserRegisterView(generics.CreateAPIView):
 @method_decorator(csrf_protect, name="dispatch")       
 @method_decorator(login_required, name="dispatch")       
 class UpdateProfileView(generics.UpdateAPIView):
+    serializer_class = UpdateProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     def put(self, request, format=None):
         try:
@@ -94,28 +97,38 @@ class UserLoginView(APIView):
         except:
             return Response({"Oops!": "Something went wrong when trying to login. \n Please try again later."})
             
+
 @method_decorator(csrf_protect, name="dispatch")
 @method_decorator(login_required, name="dispatch")
 class ChangeEmailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    
     def post(self, request):
         try:
             password = request.data.get("password")
             new_email = request.data.get("new_email")
+            
             user = authenticate(request, username=request.user.username, password=password)
+            
             if user is not None:
                 if user.is_active:
                     user.email = new_email
                     user.save()
-                    return JsonResponse({"message": "Email changed successfully"})
+                    return Response({"message": "Email changed successfully"})
                 else:
-                    return JsonResponse({"error": "Your account is disabled."}, status=400)
+                    return Response({"error": "Your account is disabled."}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return JsonResponse(
-                    {"error": "Invalid login details supplied."}, status=400
-                )
-        except:
-            return Response({"Oops!": "Something went wrong when trying to update your email. \n Please try again later."})
+                return Response({"error": "Invalid login details supplied."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except IntegrityError as e:
+            return Response({"error": "Email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            return Response({"error": "Oops! Something went wrong when trying to update your email. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @method_decorator(csrf_protect, name="dispatch")
 class ChangePasswordView(APIView):
@@ -196,57 +209,57 @@ class TemplateSearchView(generics.ListAPIView):
         return queryset
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(login_required, name='dispatch')
-@api_view(["POST"])
-def upload_template(request):
-    serializer = TemplateCreatorSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    title = request.data.get("title")
-    description = request.data.get("description")
-    category = request.data.get("category")
-    image = request.FILES.get("image")
-    file = request.FILES.get("file")
-    is_free = request.data.get("is_free")
-    price = request.data.get("price")
-
-    # Perform file type validation
-    allowed_extensions = [
-        ".html",
-        ".htm",
-        ".zip",
-        "jpeg",
-        "jpg",
-        "png",
-    ]  # Add other allowed file extensions as needed
-
-    file_extension = default_storage.get_extension(file.name)
-    if file_extension not in allowed_extensions:
-        return Response(
-            {
-                "error": "Invalid file type. Accepted file types are: html, htm, zip, jpeg, jpg, png."
-            },
-            status=400,
-        )
 
 
-    # Save the template if it passes the validation
-    try:
-        template = Template(
-            title=title,
-            description=description,
-            file=file,
-            image=image,
-            category=category,
-            is_free=is_free,
-            price=price,
-        )
-        template.full_clean()  # Validate model fields
-        template.save()
-    except ValidationError as e:
-        return Response({"error": e}, status=400)
+class UploadTemplateView(APIView):
+    def post(self, request, format=None):
+        serializer = TemplateCreatorSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        title = request.data.get("title")
+        description = request.data.get("description")
+        category = request.data.get("category")
+        image = request.FILES.get("image")
+        file = request.FILES.get("file")
+        is_free = request.data.get("is_free")
+        price = request.data.get("price")
 
-    return Response({"message": "Template uploaded successfully"})
+        # Perform file type validation
+        allowed_extensions = [
+            ".html",
+            ".htm",
+            ".zip",
+            "jpeg",
+            "jpg",
+            "png",
+        ]  # Add other allowed file extensions as needed
+
+        file_extension = default_storage.get_extension(file.name)
+        if file_extension not in allowed_extensions:
+            return Response(
+                {
+                    "error": "Invalid file type. Accepted file types are: html, htm, zip, jpeg, jpg, png."
+                },
+                status=400,
+            )
+
+
+        # Save the template if it passes the validation
+        try:
+            template = Template(
+                title=title,
+                description=description,
+                file=file,
+                image=image,
+                category=category,
+                is_free=is_free,
+                price=price,
+            )
+            template.full_clean()  # Validate model fields
+            template.save()
+        except ValidationError as e:
+            return Response({"error": e}, status=400)
+
+        return Response({"message": "Template uploaded successfully"})
 
 
 def get_csrf_token(request):

@@ -68,6 +68,7 @@ class TemplateCreatorSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "image",
+            "file",
             "category",
             "author",
             "is_free",

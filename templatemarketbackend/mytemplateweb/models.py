@@ -20,6 +20,7 @@ class UserProfile(models.Model):
 class Template(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
+    file = models.FileField(upload_to="templates/files", blank=True, null=True)
     image = models.ImageField(upload_to="templates/images")
     category = models.CharField(max_length=50, name="category")
     created_at = models.DateTimeField(auto_now_add=True)
