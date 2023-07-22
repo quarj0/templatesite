@@ -27,9 +27,9 @@ urlpatterns = [
     path("account/login", UserLoginView.as_view(), name="login"),
     path("account/user/profile", UserProfileView.as_view(), name="user profile"),
     path("account/change/email", ChangeEmailView.as_view(), name="change email"),
+    path("account/change/password", ChangePasswordView.as_view(), name="login"),
     path("templatelist", TemplateListView.as_view(), name="template-list"),
     path("templates/search", TemplateSearchView.as_view(), name="template-search"),
-    path("account/change/password", ChangePasswordView.as_view(), name="login"),
     path("reset/password", ResetPasswordView.as_view(), name="reset password"),
     path(
         "reset/password/<str:uid>/<str:token>/",

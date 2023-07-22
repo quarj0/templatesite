@@ -133,26 +133,23 @@ class ChangeEmailView(APIView):
 @method_decorator(csrf_protect, name="dispatch")
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    
     def post(self, request):
-        username = request.data.get("username")
         old_password = request.data.get("password")
         new_password = request.data.get("new_password")
-        user = authenticate(request, username=username, password=old_password)
-        if user is not None:
-            if user.is_active:
-                user.set_password(new_password)
-                user.save()
-                return JsonResponse({"message": "Password changed successfully"})
-            else:
-                return JsonResponse({"error": "Your account is disabled."}, status=400)
+        
+        user = request.user  # Assuming you are using TokenAuthentication or SessionAuthentication
+        
+        if user.check_password(old_password):
+            user.set_password(new_password)
+            user.save()
+            return Response({"message": "Password changed successfully"})
         else:
-            return JsonResponse(
-                {"error": "Invalid login details supplied."}, status=400
-            )
+            return Response({"error": "Invalid old password."}, status=status.HTTP_400_BAD_REQUEST)
 
 @method_decorator(csrf_protect, name="dispatch")
 class ResetPasswordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     def post(self, request):
         email = request.data.get("email")
         try:
