@@ -39,7 +39,9 @@ CORS_ALLOWED_ORIGINS = [
     # Add more allowed origins as needed
 ]
 
-
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
 
 # Application definition
 

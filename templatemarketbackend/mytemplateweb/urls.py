@@ -15,7 +15,7 @@ from .views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-
+from . import views
 
 app_name = "templatesapi"
 
@@ -33,6 +33,10 @@ urlpatterns = [
     path("password/reset", ResetPasswordView.as_view(), name="reset password"),
     path("password/reset/<str:uid>/<str:token>/", ResetPasswordView.as_view(), name="reset password"),
     path("order", OrderView.as_view(), name="order-template"),
+    path('templates/<int:pk>/', views.TemplateDetailView.as_view(), name='template-detail'),
+    path('templates/<int:pk>/rate/', views.TemplateRatingView.as_view(), name='template-rate'),
+    path('templates/<int:pk>/review/', views.TemplateReviewView.as_view(), name='template-review'),
+    path('account/logout', views.UserLogoutView.as_view(), name='logout'),
     
 ]
-# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

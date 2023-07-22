@@ -1,24 +1,12 @@
 from rest_framework import serializers
-from .models import Template, UserProfile, Order, Category
+from .models import Template, UserProfile, Order, Category, Rating, Review
 import re
 
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template
-        fields = [
-            "id",
-            "title",
-            "description",
-            "image",
-            "category",
-            "created_at",
-            "download_link",
-            "author",
-            "is_free",
-            "price",
-            "rating",
-        ]
-    
+        fields = '__all__' 
+        
         
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,6 +32,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "city",
             "phone",
             "address",
+            "profile_picture",
         ]
         
 
@@ -58,6 +47,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "city",
             "phone",
             "address",
+            "profile_picture"
         ]
 
 
@@ -70,7 +60,6 @@ class TemplateCreatorSerializer(serializers.ModelSerializer):
             "image",
             "file",
             "category",
-            "author",
             "is_free",
             "price",
         ]
@@ -95,3 +84,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must contain at least 6 characters, one uppercase, one lowercase, one number and one special character")
         return data
     
+    
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = '__all__'
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'

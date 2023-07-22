@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.middleware.csrf import get_token
 from django.core.exceptions import ValidationError
@@ -20,6 +20,8 @@ from django.utils.decorators import method_decorator
 from templatemarket.settings import EMAIL_HOST_USER
 from .models import Template, UserProfile, Order, User
 from .serializers import (
+    RatingSerializer,
+    ReviewSerializer,
     TemplateSerializer,
     UpdateProfileSerializer,
     UserRegisterSerializer,
@@ -51,7 +53,9 @@ class UserRegisterView(generics.CreateAPIView):
 @method_decorator(csrf_protect, name="dispatch")       
 @method_decorator(login_required, name="dispatch")       
 class UpdateProfileView(generics.UpdateAPIView):
+    queryset = UserProfile.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UpdateProfileSerializer
     def put(self, request, format=None):
         try:
             serializer = UpdateProfileSerializer(
@@ -94,6 +98,13 @@ class UserLoginView(APIView):
         except:
             return Response({"Oops!": "Something went wrong when trying to login. \n Please try again later."})
             
+
+class UserLogoutView(APIView):
+    def post(self, request):
+        logout(request)
+        return JsonResponse({"message": "Logout successful"})            
+            
+
 @method_decorator(csrf_protect, name="dispatch")
 @method_decorator(login_required, name="dispatch")
 class ChangeEmailView(APIView):
@@ -139,7 +150,6 @@ class ChangePasswordView(APIView):
 
 @method_decorator(csrf_protect, name="dispatch")
 class ResetPasswordView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
     def post(self, request):
         email = request.data.get("email")
         try:
@@ -196,6 +206,24 @@ class TemplateSearchView(generics.ListAPIView):
         return queryset
 
 
+class TemplateDetailView(generics.RetrieveAPIView):
+    queryset = Template.objects.all()
+    serializer_class = TemplateSerializer
+    
+    def get(self, request, pk, format=None):
+        template = self.get_object()
+        serializer = TemplateSerializer(template)
+        return Response(serializer.data)
+    
+
+class TemplateReviewView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ReviewSerializer
+
+
+class TemplateRatingView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = RatingSerializer
 
 
 class UploadTemplateView(APIView):
