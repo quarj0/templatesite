@@ -1,47 +1,49 @@
 # TemplateSite 
 
 Welcome to Template Shop, the ultimate marketplace for templates! Whether you're looking for premium templates to purchase or have your own creative templates to sell, Template Shop has got you covered. With a seamless integration of Django and React, we offer a user-friendly and feature-rich platform for template enthusiasts.
-Features
 
-    Buy and Sell Templates: Users can browse through a wide variety of templates, both free and premium. If you have a unique template to share with the community, you can easily upload and list it for sale.
+## Features
 
-    User Registration and Authentication: To access all the features of Template Shop, users can register an account securely. We ensure a smooth and hassle-free authentication process.
+Buy and Sell Templates: Users can browse through a wide variety of templates, both free and premium. If you have a unique template to share with the community, you can easily upload and list it for sale.
 
-    Dashboard: Once logged in, users have access to a personalized dashboard where they can manage their uploaded templates, view their purchase history, and keep track of earnings from sales.
+User Registration and Authentication: To access all the features of Template Shop, users can register an account securely. We ensure a smooth and hassle-free authentication process.
 
-    Template Preview: Users can preview templates before making a purchase decision, allowing them to ensure it perfectly fits their needs.
+Dashboard: Once logged in, users have access to a personalized dashboard where they can manage their uploaded templates, view their purchase history, and keep track of earnings from sales.
 
-    Secure Transactions: We prioritize security, so all transactions are handled through a secure payment gateway, ensuring a safe shopping experience for buyers and sellers alike.
+Template Preview: Users can preview templates before making a purchase decision, allowing them to ensure it perfectly fits their needs.
 
-    Search and Filters: With our advanced search and filtering options, finding the perfect template is a breeze. Sort by categories, price, and more.
+Secure Transactions: We prioritize security, so all transactions are handled through a secure payment gateway, ensuring a safe shopping experience for buyers and sellers alike.
 
-    User Ratings and Reviews: Buyers can leave ratings and reviews for templates they have purchased, helping others make informed decisions.
+Search and Filters: With our advanced search and filtering options, finding the perfect template is a breeze. Sort by categories, price, and more.
 
-    Responsive Design: Template Shop is fully responsive, ensuring a seamless experience across all devices, from desktops to smartphones.
+User Ratings and Reviews: Buyers can leave ratings and reviews for templates they have purchased, helping others make informed decisions.
+
+Responsive Design: Template Shop is fully responsive, ensuring a seamless experience across all devices, from desktops to smartphones.
 
 Demo
 
 Check out our live demo <a href="link-will-be-provided-later" target=_blank >here<a/> to explore the functionalities of Templatesite.
 
-Usage
+## Usage
 User Registration
 
 To access all the features, users need to register an account on Templatesite. Click on the "Sign Up" button on the homepage and provide the required information to create your account.
-Buying Templates
 
-    Browse through the selection of templates available on the website.
-    Click on a template to view its details and click "Purchase" for premium templates.
-    Complete the payment process securely via the integrated payment gateway.
-    Once the transaction is successful, you can download the template immediately.
+### Buying Templates
 
-Selling Templates
+Browse through the selection of templates available on the website.
+Click on a template to view its details and click "Purchase" for premium templates.
+Complete the payment process securely via the integrated payment gateway.
+Once the transaction is successful, you can download the template immediately.
 
-    Log in to your account and go to your dashboard.
-    Click on "Upload Template" to submit your template for review.
-    After approval, your template will be available for purchase in the marketplace.
-    You'll receive earnings from sales directly to your account.
+### Selling Templates
 
-Contributing
+Log in to your account and go to your dashboard.
+Click on "Upload Template" to submit your template for review.
+After approval, your template will be available for purchase in the marketplace.
+You'll receive earnings from sales directly to your account.
+
+## Contributing
 
 We welcome contributions from the community to enhance TemplateSite. If you encounter any issues or have ideas for improvements, please open an issue or submit a pull request.
 License
